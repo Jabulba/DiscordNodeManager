@@ -1,0 +1,19 @@
+####################################
+# Nodewar Manager Configuration    #
+####################################
+version: "test-version"
+
+# Bot specific configurations
+bot {
+  # Your Discord bot token
+  token: "test-token",
+
+  # The prefix used to identify a command in chat
+  prefix: "test-prefix",
+}
+
+# Database specific configurations
+database {
+  # The folder to store files related to the database
+  path: "test-database-path",
+}
