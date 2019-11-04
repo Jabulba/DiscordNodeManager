@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
 	"nodewarmanager/config"
 )
 
 func main() {
 	err := config.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
