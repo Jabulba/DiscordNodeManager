@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 )
 
@@ -47,31 +48,16 @@ func TestConfigLoadingWithoutConfigFile(t *testing.T) {
 
 	// Load the config
 	err := Load()
-	if err != nil {
-		t.Errorf("Unable to Read Configuration: " + err.Error())
+	if err == nil {
+		t.Error("Expected an error but received none.")
 	}
 
-	// Check version value
-	expectedVersion := "0.0.0-Adalwolf"
-	if Version != expectedVersion {
-		t.Errorf(assetionError, expectedVersion, Version)
+	info, err := os.Stat(*configPath)
+	if os.IsNotExist(err) {
+		t.Errorf("Expected %s to exist but it doesnt.", *configPath)
 	}
 
-	// Check bot.token value
-	expectedBotToken := "your-bot-token-here"
-	if Bot.Token != expectedBotToken {
-		t.Errorf(assetionError, expectedBotToken, Bot.Token)
-	}
-
-	// Check bot.prefix value
-	expectedBotPrefix := "?"
-	if Bot.Prefix != expectedBotPrefix {
-		t.Errorf(assetionError, expectedBotPrefix, Bot.Prefix)
-	}
-
-	// Check database.path value
-	expectedDatabasePath := "./databases/"
-	if DB.Path != expectedDatabasePath {
-		t.Errorf(assetionError, expectedDatabasePath, DB.Path)
+	if info.IsDir() {
+		t.Errorf("Expected %s to be a file but its not.", *configPath)
 	}
 }
