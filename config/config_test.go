@@ -10,6 +10,7 @@ const assetionError = "Expected %s but got %s."
 func TestConfigLoadingWithTestConfigFile(t *testing.T) {
 	// Test using config file config_test.hocon
 	*configPath = "../config_test.hocon"
+	t.Errorf("Fail :(")
 
 	// Load the config
 	err := Load()
