@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-const assetionError = "Expected %s but got %s."
+const assetionError = "Expected %v but got %v."
 
 func TestConfigLoadingWithTestConfigFile(t *testing.T) {
 	// Test using config file config_test.hocon
@@ -32,7 +32,12 @@ func TestConfigLoadingWithTestConfigFile(t *testing.T) {
 	// Check bot.prefix value
 	expectedBotPrefix := "test-prefix"
 	if Bot.Prefix != expectedBotPrefix {
-		t.Errorf(assetionError, expectedVersion, Bot.Prefix)
+		t.Errorf(assetionError, expectedBotPrefix, Bot.Prefix)
+	}
+
+	// Check bot.debug value
+	if Bot.Debug {
+		t.Errorf(assetionError, false, Bot.Debug)
 	}
 
 	// Check database.path value

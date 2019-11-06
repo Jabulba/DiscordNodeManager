@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"nodewarmanager/bot"
 	"nodewarmanager/config"
 )
 
@@ -10,4 +11,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer bot.Connect()
 }

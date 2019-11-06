@@ -25,6 +25,8 @@ type bot struct {
 	Token string
 	// Prefix recognized by the bot in text channels
 	Prefix string
+	// Debug true/false to enable/disable debug logging
+	Debug bool
 }
 
 type db struct {
@@ -82,6 +84,7 @@ func Load() error {
 	Bot = bot{
 		Token:  conf.GetString("bot.token"),
 		Prefix: conf.GetString("bot.prefix"),
+		Debug:  conf.GetBoolean("bot.debug"),
 	}
 
 	DB = db{
