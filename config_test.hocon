@@ -10,6 +10,9 @@ bot {
 
   # The prefix used to identify a command in chat
   prefix: "test-prefix",
+
+  # Enable or disable the bots debug log
+  debug: false
 }
 
 # Database specific configurations
