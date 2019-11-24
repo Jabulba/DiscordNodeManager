@@ -24,5 +24,5 @@ func main() {
 
 	defer db.Disconnect()
 
-	bot.Connect()
+	bot.Connect(db)
 }

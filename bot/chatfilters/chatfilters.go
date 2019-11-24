@@ -12,6 +12,9 @@ var PrefixFilter *std.MsgFilter
 // HelpCommand is a disgord filter with the help prefix already configured
 var HelpCommand *std.MsgFilter
 
+// ChannelCommand is a disgord filter with the channel prefix already configured
+var ChannelCommand *std.MsgFilter
+
 // Load or reload the filters
 func Load(client disgord.Session) {
 	PrefixFilter, _ = std.NewMsgFilter(client)
@@ -19,4 +22,7 @@ func Load(client disgord.Session) {
 
 	HelpCommand, _ = std.NewMsgFilter(client)
 	HelpCommand.SetPrefix("help")
+
+	ChannelCommand, _ = std.NewMsgFilter(client)
+	ChannelCommand.SetPrefix("channel")
 }

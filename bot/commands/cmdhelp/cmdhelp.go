@@ -2,6 +2,7 @@ package cmdhelp
 
 import (
 	"github.com/jabulba/disgord"
+	"github.com/jabulba/disgord/std"
 	"nodewarmanager/bot/chatfilters"
 	"nodewarmanager/config"
 )
@@ -29,6 +30,8 @@ The payout period is composed by a start date and an end date. All node wars tha
 
 	client.On(disgord.EvtMessageCreate,
 		chatfilters.PrefixFilter.HasPrefix,
+		chatfilters.PrefixFilter.NotByBot,
+		std.CopyMsgEvt,
 		chatfilters.PrefixFilter.StripPrefix,
 		chatfilters.HelpCommand.HasPrefix,
 		func(s disgord.Session, evt *disgord.MessageCreate) {

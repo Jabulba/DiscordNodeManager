@@ -3,12 +3,14 @@ package bot
 import (
 	"github.com/jabulba/disgord"
 	"nodewarmanager/bot/chatfilters"
+	"nodewarmanager/bot/commands/cmdchannel"
 	"nodewarmanager/bot/commands/cmdhelp"
 	"nodewarmanager/config"
+	"nodewarmanager/idb"
 )
 
 // Connect the bot with Discord and register all commands
-func Connect() {
+func Connect(db idb.IDatabase) {
 	client := disgord.New(disgord.Config{
 		BotToken: config.Bot.Token,
 		Logger:   disgord.DefaultLogger(config.Bot.Debug), // debug=false
@@ -17,4 +19,5 @@ func Connect() {
 	defer client.StayConnectedUntilInterrupted()
 	chatfilters.Load(client)
 	cmdhelp.Register(client)
+	cmdchannel.Register(client, db)
 }
