@@ -2,8 +2,8 @@ package bot
 
 import (
 	"github.com/jabulba/disgord"
-	"nodewarmanager/bot/commands/help"
-	"nodewarmanager/bot/filters"
+	"nodewarmanager/bot/chatfilters"
+	"nodewarmanager/bot/commands/cmdhelp"
 	"nodewarmanager/config"
 )
 
@@ -15,6 +15,6 @@ func Connect() {
 	})
 
 	defer client.StayConnectedUntilInterrupted()
-	filters.Load(client)
-	help.Register(client)
+	chatfilters.Load(client)
+	cmdhelp.Register(client)
 }

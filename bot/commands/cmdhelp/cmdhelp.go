@@ -1,8 +1,8 @@
-package help
+package cmdhelp
 
 import (
 	"github.com/jabulba/disgord"
-	"nodewarmanager/bot/filters"
+	"nodewarmanager/bot/chatfilters"
 	"nodewarmanager/config"
 )
 
@@ -28,9 +28,9 @@ When monitoring a node war, the bot will keep an eye on who enters and leaves th
 The payout period is composed by a start date and an end date. All node wars that happen during the payout period are combined in the payout summary.`
 
 	client.On(disgord.EvtMessageCreate,
-		filters.PrefixFilter.HasPrefix,
-		filters.PrefixFilter.StripPrefix,
-		filters.HelpCommand.HasPrefix,
+		chatfilters.PrefixFilter.HasPrefix,
+		chatfilters.PrefixFilter.StripPrefix,
+		chatfilters.HelpCommand.HasPrefix,
 		func(s disgord.Session, evt *disgord.MessageCreate) {
 			_, _ = evt.Message.Reply(s, helpText)
 		})

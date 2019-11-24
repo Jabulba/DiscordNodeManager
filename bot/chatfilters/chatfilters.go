@@ -1,4 +1,4 @@
-package filters
+package chatfilters
 
 import (
 	"github.com/jabulba/disgord"
