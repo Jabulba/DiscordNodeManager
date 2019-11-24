@@ -30,6 +30,11 @@ type bot struct {
 }
 
 type db struct {
+	// BadgerDB config
+	BadgerDB bdb
+}
+
+type bdb struct {
 	// Path used to save all Database files
 	Path string
 }
@@ -70,8 +75,8 @@ func Load() error {
 		return errors.New("config file is missing the bot.prefix value")
 	}
 
-	if !conf.HasPath("database.path") {
-		return errors.New("config file is missing the database.path value")
+	if !conf.HasPath("database.badger.path") {
+		return errors.New("config file is missing the database.badger.path value")
 	}
 
 	if !conf.HasPath("version") {
@@ -88,7 +93,9 @@ func Load() error {
 	}
 
 	DB = db{
-		Path: conf.GetString("database.path"),
+		BadgerDB: bdb{
+			Path: conf.GetString("database.badger.path"),
+		},
 	}
 
 	// Validate empty token
@@ -116,6 +123,9 @@ bot {
 
 # Database specific configurations
 database {
-  # The folder to store files related to the database
-  path: "./databases/",
+  # Configurations for BadgerDB implementation.
+  badger {
+    # The folder to store files related to the database
+    path: "./.badgerdb/",
+  }
 }`
