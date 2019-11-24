@@ -6,7 +6,7 @@ import (
 	"nodewarmanager/idb/badgerdb"
 )
 
-// IDatabase is the interface used to connect and manage the database defined in t he configuration file
+// IDatabase is the interface used to connect and manage the database defined in the configuration file
 type IDatabase interface {
 	Connect() error
 	Disconnect()
