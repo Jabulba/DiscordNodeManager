@@ -108,7 +108,7 @@ func Load() error {
 }
 
 var defaultConfig = `####################################
-# Nodewar Manager Configuration    #
+# Node War Manager Configuration    #
 ####################################
 version: "0.0.0-Adalwolf"
 
@@ -119,6 +119,9 @@ bot {
 
   # The prefix used to identify a command in chat
   prefix: "?",
+
+  # Enable or disable the bots debug log
+  debug: false
 }
 
 # Database specific configurations
