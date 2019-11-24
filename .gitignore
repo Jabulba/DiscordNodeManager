@@ -13,3 +13,8 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Files created during bot development/testing
+.badgerdb_test
+.badgerdb
+config.hocon

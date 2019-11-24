@@ -1,0 +1,25 @@
+####################################
+# Nodewar Manager Configuration    #
+####################################
+version: "test-version"
+
+# Bot specific configurations
+bot {
+  # Your Discord bot token
+  token: "test-token",
+
+  # The prefix used to identify a command in chat
+  prefix: "test-prefix",
+
+  # Enable or disable the bots debug log
+  debug: false
+}
+
+# Database specific configurations
+database {
+  # Configurations for BadgerDB implementation.
+  badger {
+    # The folder to store files related to the database
+    path: "test-database-path",
+  }
+}

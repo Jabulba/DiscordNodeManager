@@ -17,6 +17,9 @@ bot {
 
 # Database specific configurations
 database {
-  # The folder to store files related to the database
-  path: "test-database-path",
+  # Configurations for BadgerDB implementation.
+  badger {
+    # The folder to store files related to the database
+    path: "../../tests/.badgerdb_test/",
+  }
 }
