@@ -1,14 +1,12 @@
 package cmdchannel
 
 import (
-	"github.com/jabulba/disgord"
-	"github.com/jabulba/disgord/std"
-	"nodewarmanager/bot/chatfilters"
+	"github.com/bwmarrin/discordgo"
 	"nodewarmanager/config"
 	"nodewarmanager/idb"
+	"nodewarmanager/utils"
 	"sort"
 	"strconv"
-	"strings"
 )
 
 var helpText = `Use this command to define your Node War channels. All channels registered with this command will be monitored during a Node War!
@@ -23,34 +21,24 @@ The payout period is composed by a start date and an end date. All node wars tha
 
 Monitored Channels:
 `
+var Prefix = "channel"
 
 const errMsg = "Aww, snap! Something terrible has happened... Your request has failed :("
 
-// Register the help command with disgord
-func Register(client disgord.Session, db idb.IDatabase) {
-	client.On(disgord.EvtMessageCreate,
-		chatfilters.PrefixFilter.NotByBot,
-		chatfilters.PrefixFilter.HasPrefix,
-		std.CopyMsgEvt,
-		chatfilters.PrefixFilter.StripPrefix,
-		chatfilters.ChannelCommand.HasPrefix,
-		chatfilters.ChannelCommand.StripPrefix,
-		func(s disgord.Session, evt *disgord.MessageCreate) {
-			var chatMsg string
-			userMsg := strings.TrimSpace(evt.Message.Content)
-			if len(userMsg) == 0 {
-				// No channel was specified, show the help message and the summary of channels
-				chatMsg = displaySummary(s, evt, db)
-			} else {
-				// Toggle specified channel
-				chatMsg = toggleChannelMonitoring(userMsg, s, evt, db)
-			}
+func MessageCreate(s *discordgo.Session, evt *discordgo.MessageCreate) {
+	var chatReply string
+	if len(evt.Content) == 0 {
+		// No channel was specified, show the help message and the summary of channels
+		chatReply = displaySummary(s, evt.GuildID)
+	} else {
+		// Toggle specified channel
+		chatReply = toggleChannelMonitoring(evt.Content, s, evt.GuildID)
+	}
 
-			_, _ = evt.Message.Reply(s, chatMsg)
-		})
+	_, _ = s.ChannelMessageSend(evt.ChannelID, chatReply)
 }
 
-func toggleChannelMonitoring(userMsg string, s disgord.Session, evt *disgord.MessageCreate, db idb.IDatabase) string {
+func toggleChannelMonitoring(userMsg string, s *discordgo.Session, guildID string) string {
 	var chatMsg string
 	chanNum, err := strconv.Atoi(userMsg)
 	if err != nil {
@@ -58,21 +46,21 @@ func toggleChannelMonitoring(userMsg string, s disgord.Session, evt *disgord.Mes
 		chatMsg = "Your input '" + userMsg + "' is not a number... You need to specify the number of the channel here!"
 	} else {
 		// We got a number! Lets add or remove it from the list
-		channels, err := s.GetGuildChannels(evt.Message.GuildID)
+		channels, err := s.GuildChannels(guildID)
 		if err != nil {
 			return errMsg
 		}
 
 		for _, c := range channels {
 			// Skip non voice channels
-			if c.Type != disgord.ChannelTypeGuildVoice {
+			if c.Type != discordgo.ChannelTypeGuildVoice {
 				continue
 			}
 
 			// Check for the desired channel
 			if c.Position == chanNum {
 				// Toggle channel
-				monitored, err := db.ToggleMonitoredChannel(evt.Message.GuildID.String(), c.ID.String())
+				monitored, err := idb.DB.ToggleMonitoredChannel(guildID, c.ID)
 				if err != nil {
 					return errMsg
 				}
@@ -88,43 +76,27 @@ func toggleChannelMonitoring(userMsg string, s disgord.Session, evt *disgord.Mes
 	return chatMsg
 }
 
-func displaySummary(s disgord.Session, evt *disgord.MessageCreate, db idb.IDatabase) string {
-	chanList, err := db.GetMonitoredGuildChannelIDs(evt.Message.GuildID.String())
+func displaySummary(s *discordgo.Session, guildID string) string {
+	chanList, err := idb.DB.GetMonitoredGuildChannelIDs(guildID)
 	if err != nil {
 		return errMsg
 	}
 
 	var chatMsg string
-	var ordChanList []*disgord.Channel
 	if len(chanList) == 0 {
 		chatMsg = helpText + "BOOO! No channel is being monitored :("
 	} else {
 		chatMsg = helpText
-		for _, cid := range chanList {
-			snowflake, err := disgord.GetSnowflake(cid)
-			if err != nil {
-				return errMsg
-			}
-
-			c, err := s.GetChannel(snowflake)
-			if err != nil {
-				return errMsg
-			}
-
-			ordChanList = append(ordChanList, c)
+		channelNames, err := utils.GetChannelNames(chanList, s)
+		if err != nil {
+			return errMsg
 		}
 
-		sort.SliceStable(ordChanList, func(i, j int) bool {
-			return ordChanList[i].Position < ordChanList[j].Position
-		})
-
-		for _, c := range ordChanList {
-			chatMsg += "\n" + strconv.Itoa(c.Position) + ") " + c.Name
-		}
+		chatMsg += channelNames
 	}
 
 	// Now we will list all available channels and their numbers so the user can add more channels to the monitored list!
-	channels, err := s.GetGuildChannels(evt.Message.GuildID)
+	channels, err := s.GuildChannels(guildID)
 	if err != nil {
 		// Something went wrong but we already have a lot of information here!
 		return chatMsg
@@ -138,13 +110,13 @@ func displaySummary(s disgord.Session, evt *disgord.MessageCreate, db idb.IDatab
 
 ChannelsFor:
 	for _, c := range channels {
-		if c.Type != disgord.ChannelTypeGuildVoice {
+		if c.Type != discordgo.ChannelTypeGuildVoice {
 			continue
 		}
 
 		// Ignore all monitored channels
 		for _, cID := range chanList {
-			if c.ID.String() == cID {
+			if c.ID == cID {
 				continue ChannelsFor
 			}
 		}

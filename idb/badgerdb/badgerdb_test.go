@@ -65,7 +65,7 @@ func TestBadgerDB_GetMonitoredGuildChannelIDs_ToggleMonitoredChannel(t *testing.
 		log.Fatal(err)
 	}
 
-	guildId := "test-guild"
+	guildId := "12345"
 
 	// Assert no channels return from monitored channels list
 	channels, err := bdb.GetMonitoredGuildChannelIDs(guildId)
@@ -79,7 +79,8 @@ func TestBadgerDB_GetMonitoredGuildChannelIDs_ToggleMonitoredChannel(t *testing.
 	}
 
 	// Monitor a channel
-	channel1ID := "test-channel-1"
+	channel1ID := "987654"
+
 	b, err := bdb.ToggleMonitoredChannel(guildId, channel1ID)
 	if err != nil {
 		log.Fatal(err)
