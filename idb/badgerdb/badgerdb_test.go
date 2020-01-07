@@ -10,6 +10,7 @@ import (
 	"nodewarmanager/tests"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestBadgerDB_Connect_Disconnect(t *testing.T) {
@@ -65,7 +66,7 @@ func TestBadgerDB_GetMonitoredGuildChannelIDs_ToggleMonitoredChannel(t *testing.
 		log.Fatal(err)
 	}
 
-	guildId := "test-guild"
+	guildId := "12345"
 
 	// Assert no channels return from monitored channels list
 	channels, err := bdb.GetMonitoredGuildChannelIDs(guildId)
@@ -79,7 +80,8 @@ func TestBadgerDB_GetMonitoredGuildChannelIDs_ToggleMonitoredChannel(t *testing.
 	}
 
 	// Monitor a channel
-	channel1ID := "test-channel-1"
+	channel1ID := "987654"
+
 	b, err := bdb.ToggleMonitoredChannel(guildId, channel1ID)
 	if err != nil {
 		log.Fatal(err)
@@ -117,6 +119,52 @@ func TestBadgerDB_GetMonitoredGuildChannelIDs_ToggleMonitoredChannel(t *testing.
 	l = len(channels)
 	if l != 0 {
 		t.Errorf(tests.AssertionError, 0, l)
+	}
+
+	// Disconnect from DB
+	bdb.Disconnect()
+}
+
+func TestBadgerDB_SaveWarStatus_GetWarStatus(t *testing.T) {
+	prepareTest(t)
+	defer os.RemoveAll(config.DB.BadgerDB.Path)
+
+	bdb := BadgerDB{}
+	if err := bdb.Connect(); err != nil {
+		log.Fatal(err)
+	}
+
+	guildID := "12345"
+	warDate := time.Date(2020, 01, 01, 21, 00, 00, 0, time.Local).Format("20060102")
+	participants := []string{"001", "002"}
+	err := bdb.SaveWarStatus(guildID, warDate, participants, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = bdb.SaveWarStatus(guildID, warDate, participants, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = bdb.SaveWarStatus(guildID, warDate, []string{"001"}, 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	status, err := bdb.GetWarStatus(guildID, warDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u001 := status["001"]
+	if u001 != 3 {
+		t.Errorf(tests.AssertionError, 3, u001)
+	}
+
+	u002 := status["002"]
+	if u002 != 2 {
+		t.Errorf(tests.AssertionError, 2, u001)
 	}
 
 	// Disconnect from DB

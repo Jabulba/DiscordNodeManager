@@ -8,21 +8,20 @@ import (
 )
 
 func main() {
-	err := config.Load()
-	if err != nil {
+	var err error
+	if err = config.Load(); err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := idb.Init()
-	if err != nil {
+	if err = idb.Init(); err != nil {
 		log.Fatal(err)
 	}
 
-	if err = db.Connect(); err != nil {
+	if err = idb.DB.Connect(); err != nil {
 		log.Fatal(err)
 	}
 
-	defer db.Disconnect()
+	defer idb.DB.Disconnect()
 
-	bot.Connect(db)
+	bot.Connect()
 }

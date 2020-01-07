@@ -1,23 +1,35 @@
 package bot
 
 import (
-	"github.com/jabulba/disgord"
-	"nodewarmanager/bot/chatfilters"
-	"nodewarmanager/bot/commands/cmdchannel"
-	"nodewarmanager/bot/commands/cmdhelp"
+	"github.com/bwmarrin/discordgo"
+	commandcontroller "nodewarmanager/bot/commands"
 	"nodewarmanager/config"
-	"nodewarmanager/idb"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // Connect the bot with Discord and register all commands
-func Connect(db idb.IDatabase) {
-	client := disgord.New(disgord.Config{
-		BotToken: config.Bot.Token,
-		Logger:   disgord.DefaultLogger(config.Bot.Debug), // debug=false
-	})
+func Connect() {
+	dg, err := discordgo.New("Bot " + config.Bot.Token)
+	if err != nil {
+		panic(err)
+	}
 
-	defer client.StayConnectedUntilInterrupted()
-	chatfilters.Load(client)
-	cmdhelp.Register(client)
-	cmdchannel.Register(client, db)
+	// Register the command controller MessageCreate events callback.
+	dg.AddHandler(commandcontroller.MessageCreate)
+
+	// Open a websocket connection to Discord and begin listening.
+	err = dg.Open()
+	if err != nil {
+		panic(err)
+	}
+
+	// Keep bot running until stopped
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
+	// Cleanly close down the Discord session, ignoring errors
+	_ = dg.Close()
 }
